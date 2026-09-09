@@ -2,10 +2,10 @@ from fastapi import FastAPI
 
 app = FastAPI(
     title="API Cafeteria",
-    description="API REST for cafeteria order and inventory management",
+    description="API REST para la gestión de pedidos e inventario de la cafetería",
     version="1.0.0"
 )
 
 @app.get("/", tags=["Health Check"])
 def root():
-    return {"message": "API of the cafeteria running correctly"}
+    return {"mensaje": "de que la cafetería funcione correctamente"}
