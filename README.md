@@ -10,9 +10,9 @@
 | Integrante | Rol Principal | Responsabilidades |
 | :--- | :--- | :--- |
 | **Benjamín Varela** *(Líder)* | Coordinación y seguimiento + Documentación e integración | Organización del backlog, seguimiento de hitos, integración de entregables, Swagger/OpenAPI y coherencia general del proyecto. |
-| **Benjamín R.** | Dominio y datos | Modelado de las 4 entidades, relaciones 1:N, esquemas Pydantic/DTOs y reglas de validación. |
-| **Diego** | API y lógica de negocio | Implementación de carpetas, endpoints, servicios, controladores, reglas de negocio y manejo de errores HTTP. |
-| **Mauricio** | Calidad y pruebas | Verificación funcional de endpoints, colección de pruebas en Postman/Thunder Client, validación de errores y filtro/orden/paginación. |
+| **Benjamín Riquelme.** | Dominio y datos | Modelado de las 4 entidades, relaciones 1:N, esquemas Pydantic/DTOs y reglas de validación. |
+| **Diego Manquicoy** | API y lógica de negocio | Implementación de carpetas, endpoints, servicios, controladores, reglas de negocio y manejo de errores HTTP. |
+| **Mauricio Valdés** | Calidad y pruebas | Verificación funcional de endpoints, colección de pruebas en Postman, validación de errores y filtro/orden/paginación. |
 
 ---
 
