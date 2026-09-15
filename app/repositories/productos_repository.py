@@ -12,7 +12,7 @@ class ProductosRepository:
             return None 
 
 
-    def guadar(self,datos: dict):
+    def guardar(self,datos: dict):
         nuevo_id = len(db_productos)
         datos["id"] = nuevo_id
         db_productos.append(datos)                    
