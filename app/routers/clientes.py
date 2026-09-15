@@ -1,19 +1,15 @@
-from fastapi import APIRouter, HTTPException
-from app.repositories.clientes_repository import ClientesRepository
+from fastapi import APIRouter
+from app.schemas.cliente import Cliente
 
-router = APIRouter()
-repo = ClientesRepository()
+router = APIRouter(prefix="/clientes", tags=["Clientes"])
 
-@router.get("")
-def listar_clientes():
-    return repo.obtener_todos()
+db_clientes = []
 
-@router.get("/{cliente_id}")
-def obtener_cliente(cliente_id: int):
-    cliente = repo.obtener_por_id(cliente_id)
-    if not cliente:
-        raise HTTPException(
-            status_code=404,
-            detail={"error": {"code": "RESOURCE_NOT_FOUND", "message": "Cliente no encontrado", "details": []}}
-        )
+@router.post("/", response_model=Cliente, status_code=201)
+def crear_cliente(cliente: Cliente):
+    db_clientes.append(cliente)
     return cliente
+
+@router.get("/", response_model=list[Cliente])
+def listar_clientes():
+    return db_clientes

@@ -1,4 +1,18 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from app.schemas.categoria import Categoria
+
+router = APIRouter(prefix="/categorias", tags=["Categorías"])
+
+db_categorias = []
+
+@router.post("/", response_model=Categoria, status_code=201)
+def crear_categoria(categoria: Categoria):
+    db_categorias.append(categoria)
+    return categoria
+
+@router.get("/", response_model=list[Categoria])
+def listar_categorias():
+    return db_categoriasfrom fastapi import APIRouter, HTTPException
 from app.repositories.categorias_repository import CategoriasRepository
 
 router = APIRouter()

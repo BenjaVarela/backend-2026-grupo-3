@@ -1,14 +1,13 @@
 from fastapi import APIRouter
-from app.repositories.pedidos_repository import PedidosRepository
-from app.schemas.pedido import PedidoCreate
+from app.schemas.pedido import Pedido
+from app.services.pedido_service import crear_nuevo_pedido, obtener_pedidos
 
-router = APIRouter()
-repo = PedidosRepository()
+router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
-@router.get("")
+@router.post("/", response_model=Pedido, status_code=201)
+def crear_pedido(pedido: Pedido):
+    return crear_nuevo_pedido(pedido)
+
+@router.get("/", response_model=list[Pedido])
 def listar_pedidos():
-    return repo.obtener_todos()
-
-@router.post("", status_code=201)
-def crear_pedido(pedido: PedidoCreate):
-    return repo.guardar(pedido.model_dump())
+    return obtener_pedidos()
