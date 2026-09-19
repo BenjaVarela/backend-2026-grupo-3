@@ -11,10 +11,17 @@ class CategoriasRepository:
                 return c
         return None
 
+
+    def guardar(self,datos: dict):
+            nuevo_id = len(db_productos)
+            datos["id"] = nuevo_id
+            db_productos.append(datos)                    
+            return datos
+
     def actualizar(self, categorias_id: int, datos: dict):
                 for i, p in enumerate(db_categorias):
                     if p["id"] == categorias_id:
-                        datos["id"] == categorias_id
+                        datos["id"] = categorias_id
                         db_categorias[i] = datos
                         return datos
                 return None

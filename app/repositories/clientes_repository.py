@@ -11,10 +11,17 @@ class ClientesRepository:
                 return c
         return None
 
+    def guardar(self,datos: dict):
+        nuevo_id = len(db_productos)
+        datos["id"] = nuevo_id
+        db_productos.append(datos)                    
+        return datos
+
+
     def actualizar(self, clientes_id: int, datos: dict):
                 for i, p in enumerate(db_clientes):
-                    if p["id"] == clientes_id_id:
-                        datos["id"] == clientes_id
+                    if p["id"] == clientes_id:
+                        datos["id"] = clientes_id
                         db_clientes[i] = datos
                         return datos
                 return None

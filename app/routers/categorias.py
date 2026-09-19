@@ -1,33 +1,35 @@
-from fastapi import APIRouter
-from app.schemas.categoria import Categoria
-
-router = APIRouter(prefix="/categorias", tags=["Categorías"])
-
-db_categorias = []
-
-@router.post("/", response_model=Categoria, status_code=201)
-def crear_categoria(categoria: Categoria):
-    db_categorias.append(categoria)
-    return categoria
-
-@router.get("/", response_model=list[Categoria])
-def listar_categorias():
-    return db_categoriasfrom fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
+from app.schemas.categoria import CategoriaProductoCreate, CategoriaProductoResponse
 from app.repositories.categorias_repository import CategoriasRepository
 
-router = APIRouter()
+router = APIRouter(prefix="/categorias", tags=["Categorias"])
 repo = CategoriasRepository()
 
-@router.get("")
-def listar_categorias():
-    return repo.obtener_todas()
+@router.post("/", response_model=CategoriaProductoResponse, status_code=201)
+def crear_categoria(categoria: CategoriaProductoCreate):
+    return repo.guardar(categoria.model_dump())
 
-@router.get("/{categoria_id}")
+@router.get("/", response_model=list[CategoriaProductoResponse])
+def listar_categorias():
+    return repo.obtener_todos()
+
+@router.get("/{categoria_id}", response_model=CategoriaProductoResponse)
 def obtener_categoria(categoria_id: int):
     categoria = repo.obtener_por_id(categoria_id)
     if not categoria:
-        raise HTTPException(
-            status_code=404,
-            detail={"error": {"code": "RESOURCE_NOT_FOUND", "message": "Categoria no encontrada", "details": []}}
-        )
+        raise HTTPException(status_code=404, detail="Categoria no encontrada")
     return categoria
+
+@router.put("/{categoria_id}", response_model=CategoriaProductoResponse)
+def actualizar_categoria(categoria_id: int, categoria: CategoriaProductoCreate):
+    actualizado = repo.actualizar(categoria_id, categoria.model_dump())
+    if not actualizado:
+        raise HTTPException(status_code=404, detail="Categoria no encontrada")
+    return actualizado
+
+@router.delete("/{categoria_id}", status_code=204)
+def eliminar_categoria(categoria_id: int):
+    eliminado = repo.eliminar(categoria_id)
+    if not eliminado:
+        raise HTTPException(status_code=404, detail="Categoria no encontrada")
+    return

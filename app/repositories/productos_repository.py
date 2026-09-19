@@ -21,7 +21,7 @@ class ProductosRepository:
     def actualizar(self, producto_id: int, datos: dict):
         for i, p in enumerate(db_productos):
             if p["id"] == producto_id:
-                datos["id"] == producto_id
+                datos["id"] = producto_id
                 db_productos[i] = datos
                 return datos
         return None 

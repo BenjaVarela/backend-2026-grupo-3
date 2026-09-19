@@ -19,7 +19,7 @@ class PedidosRepository:
     def actualizar(self, pedidos_id: int, datos: dict):
             for i, p in enumerate(db_pedidos):
                 if p["id"] == pedidos_id:
-                    datos["id"] == pedidos_id
+                    datos["id"] = pedidos_id
                     db_pedidos[i] = datos
                     return datos
             return None
