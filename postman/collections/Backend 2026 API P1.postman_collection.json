@@ -25,9 +25,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/categorias",
+              "raw": "{{base_url}}/categorias",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "categorias"
@@ -42,9 +42,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/categorias",
+              "raw": "{{base_url}}/categorias",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "categorias"
@@ -65,7 +65,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Mauricio Valdés\",\r\n  \"correo\": \"mauricio.valdes@alu.uct.cl\",\r\n  \"telefono\": \"+56912345678\",\r\n  \"tipo_cliente\": \"Estudiante\"\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Mauricio Valdés\",\r\n  \"email\": \"mauricio.valdes@alu.uct.cl\",\r\n  \"telefono\": \"+56912345678\",\r\n  \"tipo_cliente\": \"Estudiante\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -73,9 +73,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/clientes",
+              "raw": "{{base_url}}base_url}/clientes",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}base_url}"
               ],
               "path": [
                 "clientes"
@@ -99,9 +99,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/clientes",
+              "raw": "{{base_url}}/clientes",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "clientes"
@@ -116,9 +116,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/clientes/1",
+              "raw": "{{base_url}}/clientes/1",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "clientes",
@@ -167,9 +167,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/pedidos",
+              "raw": "{{base_url}}/pedidos",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "pedidos"
@@ -193,9 +193,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/pedidos",
+              "raw": "{{base_url}}/pedidos",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "pedidos"
@@ -210,9 +210,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/pedidos",
+              "raw": "{{base_url}}/pedidos",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "pedidos"
@@ -236,9 +236,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/pedidos/1/estado",
+              "raw": "{{base_url}}/pedidos/1/estado",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "pedidos",
@@ -255,7 +255,7 @@
       "name": "Productos",
       "item": [
         {
-          "name": "Productos",
+          "name": "Crear Productos",
           "request": {
             "method": "POST",
             "header": [],
@@ -269,9 +269,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/productos",
+              "raw": "{{base_url}}/productos",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "productos"
@@ -286,9 +286,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/productos",
+              "raw": "{{base_url}}/productos",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "productos"
@@ -303,9 +303,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/productos?pagina=1&limite=5",
+              "raw": "{{base_url}}/productos?pagina=1&limite=5",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "productos"
@@ -330,9 +330,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/productos/1",
+              "raw": "{{base_url}}/productos/1",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "productos",
@@ -357,9 +357,9 @@
               }
             },
             "url": {
-              "raw": "URL{{base_url}}/productos/1",
+              "raw": "{{base_url}}/productos/1",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "productos",
@@ -375,9 +375,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "URL{{base_url}}/productos/1",
+              "raw": "{{base_url}}/productos/1",
               "host": [
-                "URL{{base_url}}"
+                "{{base_url}}"
               ],
               "path": [
                 "productos",
