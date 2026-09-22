@@ -73,9 +73,9 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}base_url}/clientes",
+              "raw": "{{base_url}}/clientes",
               "host": [
-                "{{base_url}}base_url}"
+                "{{base_url}}"
               ],
               "path": [
                 "clientes"
