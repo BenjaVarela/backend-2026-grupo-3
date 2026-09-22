@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "643c5d9a-d480-49ed-9c8b-1d33cfeced91",
+    "_postman_id": "ec568ab7-8714-447b-a823-b4c4f05f30b8",
     "name": "Backend 2026 API P1",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "57564400",
-    "_collection_link": "https://go.postman.co/collection/57564400-643c5d9a-d480-49ed-9c8b-1d33cfeced91?source=collection_link"
+    "_exporter_id": "57564322",
+    "_collection_link": "https://go.postman.co/collection/57564322-ec568ab7-8714-447b-a823-b4c4f05f30b8?source=collection_link"
   },
   "item": [
     {
@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Bebidas\",\r\n  \"descripcion\": \"Bebidas frías y calientes\",\r\n  \"activa\": true\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Bebidas frías\",\r\n  \"descripcion\": \"Jugos, gaseosas y batidos\",\r\n  \"activa\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -52,6 +52,90 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Obtener Categoría por ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categorias/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categorias",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Categoría",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Bebidas Calientes Modificada\",\r\n  \"descripcion\": \"Cafés y tés premium\",\r\n  \"activa\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categorias/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categorias",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Categoría",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categorias/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categorias",
+                "1"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -65,7 +149,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Mauricio Valdés\",\r\n  \"email\": \"mauricio.valdes@alu.uct.cl\",\r\n  \"telefono\": \"+56912345678\",\r\n  \"tipo_cliente\": \"Estudiante\"\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Mauricio Valdés\",\r\n  \"correo\": \"mauricio.valdes@alu.uct.cl\",\r\n  \"telefono\": \"+56912345678\",\r\n  \"tipo_cliente\": \"Estudiante\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -91,7 +175,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"\",\r\n  \"email\": \"correo-invalido\"\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Benjamin\",\r\n  \"email\": \"correo-invalido\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -142,6 +226,51 @@
                 "clientes",
                 "1",
                 "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Cliente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Mauricio Valdés Actualizado\",\r\n  \"correo\": \"mauricio.valdes@alu.uct.cl\",\r\n  \"telefono\": \"+56987654321\",\r\n  \"tipo_cliente\": \"Estudiante\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Cliente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "clientes",
+                "1"
               ]
             }
           },
@@ -236,7 +365,7 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/pedidos/1/estado",
+              "raw": "{{base_url}}/pedidos/1/estado?estado=entregado",
               "host": [
                 "{{base_url}}"
               ],
@@ -244,6 +373,13 @@
                 "pedidos",
                 "1",
                 "estado"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "entregado",
+                  "type": "text"
+                }
               ]
             }
           },
