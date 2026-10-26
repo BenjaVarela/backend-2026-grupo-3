@@ -91,3 +91,52 @@ app/
 ├── schemas/
 ├── services/
 └── main.py
+```
+
+## Instalación y Ejecución Local
+
+### Requisitos Previos
+* Python 3.10 o superior instalado.
+* Git instalado.
+
+### Pasos para ejecutar la aplicación
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/BenjaVarela/backend-2026-grupo-3.git
+   cd backend-2026-grupo-3
+   ```
+
+2. **Crear y activar el entorno virtual:**
+
+   * **Windows (PowerShell):**
+     ```powershell
+     python -m venv venv
+     .\venv\Scripts\activate
+     ```
+
+   * **Windows (Git Bash):**
+     ```bash
+     python -m venv venv
+     source venv/Scripts/activate
+     ```
+
+   * **Linux / macOS:**
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
+
+3. **Instalar dependencias del proyecto:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Levantar el servidor de desarrollo:**
+   ```bash
+   python -m uvicorn app.main:app --reload
+   ```
+
+5. **Acceder a la Documentación Interactiva:**
+   * **Swagger UI:** http://127.0.0.1:8000/docs
+   * **ReDoc:** http://127.0.0.1:8000/redoc
