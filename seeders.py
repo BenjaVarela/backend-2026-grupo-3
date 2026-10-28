@@ -1,0 +1,38 @@
+from app.database import SessionLocal
+from app.domain.models import Categoria, Cliente, Producto, Pedido
+
+def run_seeders():
+    db = SessionLocal()
+    
+    if not db.query(Categoria).first():
+        db.add_all([
+            Categoria(nombre="Bebidas Calientes"),
+            Categoria(nombre="Pasteleria")
+        ])
+        db.commit()
+
+    if not db.query(Cliente).first():
+        db.add_all([
+            Cliente(nombre="Carlos", email="carlos@correo.com"),
+            Cliente(nombre="Maria", email="maria@correo.com")
+        ])
+        db.commit()
+
+    if not db.query(Producto).first():
+        db.add_all([
+            Producto(nombre="Cafe Americano", precio=1500.0, categoria_id=1),
+            Producto(nombre="Medialuna", precio=800.0, categoria_id=2)
+        ])
+        db.commit()
+
+    if not db.query(Pedido).first():
+        db.add_all([
+            Pedido(cliente_id=1),
+            Pedido(cliente_id=2)
+        ])
+        db.commit()
+
+    db.close()
+
+if __name__ == "__main__":
+    run_seeders()
