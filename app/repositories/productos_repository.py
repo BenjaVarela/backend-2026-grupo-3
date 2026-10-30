@@ -1,35 +1,37 @@
-db_productos = [
-    {"id": 1, "nombre": "cafe", "precio": 2000, "stock": 5, "categoria_id": 1},
-    {"id": 2, "nombre": "sandwich", "precio": 3000, "stock": 5, "categoria_id": 2}
-]
+from sqlalchemy.orm import Session
+from app.domain.producto import Producto
 
-class ProductosRepository:
-    def obtener_todos(self):
-        return db_productos
+class ProductosRepositorio:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def obtener_todas(self):
+        return self.db.query(Producto).all()
 
     def obtener_por_id(self, producto_id: int):
-        for p in db_productos:
-            if p["id"] == producto_id:
-                return p
-        return None
+        return self.db.query(Producto).filter(Producto.id == producto_id).first()
 
     def guardar(self, datos: dict):
-        nuevo_id = max([p["id"] for p in db_productos], default=0) + 1
-        datos["id"] = nuevo_id
-        db_productos.append(datos)
-        return datos
+        nuevo_producto = Producto(**datos)
+        self.db.add(nuevo_producto)
+        self.db.commit()
+        self.db.refresh(nuevo_producto)
+        return nuevo_producto
 
     def actualizar(self, producto_id: int, datos: dict):
-        for i, p in enumerate(db_productos):
-            if p["id"] == producto_id:
-                datos["id"] = producto_id
-                db_productos[i] = datos
-                return datos
-        return None
+        producto = self.obtener_por_id(producto_id)
+        if not producto:
+            return None
+        for key, value in datos.items():
+            setattr(producto, key, value)
+        self.db.commit()
+        self.db.refresh(producto)
+        return producto
 
     def eliminar(self, producto_id: int):
-        for i, p in enumerate(db_productos):
-            if p["id"] == producto_id:
-                db_productos.pop(i)
-                return True
-        return False
+        producto = self.obtener_por_id(producto_id)
+        if not producto:
+            return False
+        self.db.delete(producto)
+        self.db.commit()
+        return True
