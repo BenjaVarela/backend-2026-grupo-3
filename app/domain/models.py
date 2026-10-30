@@ -20,6 +20,7 @@ class Producto(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(100), nullable=False)
     precio = Column(Float, nullable=False)
+    stock = Column(Integer, nullable=False, default=0)
     categoria_id = Column(Integer, ForeignKey("categorias.id"))
     categoria = relationship("Categoria", back_populates="productos")
 
@@ -27,4 +28,8 @@ class Pedido(Base):
     __tablename__ = "pedidos"
     id = Column(Integer, primary_key=True, index=True)
     cliente_id = Column(Integer, ForeignKey("clientes.id"))
+    producto_id = Column(Integer, ForeignKey("productos.id"))
+    cantidad = Column(Integer, nullable=False)
+    monto_total = Column(Float, nullable=False)
+    estado = Column(String(50), nullable=False, default="pendiente")
     cliente = relationship("Cliente", back_populates="pedidos")

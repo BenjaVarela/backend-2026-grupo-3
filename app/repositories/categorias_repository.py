@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.domain.categoria import Categoria 
+from app.domain.models import Categoria
 
 class CategoriasRepositorio:
     def __init__(self, db: Session):
@@ -12,11 +12,11 @@ class CategoriasRepositorio:
         return self.db.query(Categoria).filter(Categoria.id == categoria_id).first()
 
     def guardar(self, datos: dict):
-        nueva_categoria = Categoria(**datos)
-        self.db.add(nueva_categoria)
+        nueva = Categoria(**datos)
+        self.db.add(nueva)
         self.db.commit()
-        self.db.refresh(nueva_categoria)
-        return nueva_categoria
+        self.db.refresh(nueva)
+        return nueva
 
     def actualizar(self, categoria_id: int, datos: dict):
         categoria = self.obtener_por_id(categoria_id)

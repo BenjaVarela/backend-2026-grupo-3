@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.domain.producto import Producto
+from app.domain.models import Producto
 
 class ProductosRepositorio:
     def __init__(self, db: Session):
@@ -12,11 +12,11 @@ class ProductosRepositorio:
         return self.db.query(Producto).filter(Producto.id == producto_id).first()
 
     def guardar(self, datos: dict):
-        nuevo_producto = Producto(**datos)
-        self.db.add(nuevo_producto)
+        nuevo = Producto(**datos)
+        self.db.add(nuevo)
         self.db.commit()
-        self.db.refresh(nuevo_producto)
-        return nuevo_producto
+        self.db.refresh(nuevo)
+        return nuevo
 
     def actualizar(self, producto_id: int, datos: dict):
         producto = self.obtener_por_id(producto_id)
