@@ -1,35 +1,37 @@
-db_clientes = [
-    {"id": 1, "nombre": "persona 1", "email": "persona1@email.com", "telefono": "912345678"},
-    {"id": 2, "nombre": "persona 2", "email": "persona2@email.com", "telefono": "987654321"}
-]
+from sqlalchemy.orm import Session
+from app.domain.cliente import Cliente
 
-class ClientesRepository:
-    def obtener_todos(self):
-        return db_clientes
+class ClientesRepositorio:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def obtener_todas(self):
+        return self.db.query(Cliente).all()
 
     def obtener_por_id(self, cliente_id: int):
-        for c in db_clientes:
-            if c["id"] == cliente_id:
-                return c
-        return None
+        return self.db.query(Cliente).filter(Cliente.id == cliente_id).first()
 
     def guardar(self, datos: dict):
-        nuevo_id = max([c["id"] for c in db_clientes], default=0) + 1
-        datos["id"] = nuevo_id
-        db_clientes.append(datos)
-        return datos
+        nuevo_cliente = Cliente(**datos)
+        self.db.add(nuevo_cliente)
+        self.db.commit()
+        self.db.refresh(nuevo_cliente)
+        return nuevo_cliente
 
     def actualizar(self, cliente_id: int, datos: dict):
-        for i, c in enumerate(db_clientes):
-            if c["id"] == cliente_id:
-                datos["id"] = cliente_id
-                db_clientes[i] = datos
-                return datos
-        return None
+        cliente = self.obtener_por_id(cliente_id)
+        if not cliente:
+            return None
+        for key, value in datos.items():
+            setattr(cliente, key, value)
+        self.db.commit()
+        self.db.refresh(cliente)
+        return cliente
 
     def eliminar(self, cliente_id: int):
-        for i, c in enumerate(db_clientes):
-            if c["id"] == cliente_id:
-                db_clientes.pop(i)
-                return True
-        return False
+        cliente = self.obtener_por_id(cliente_id)
+        if not cliente:
+            return False
+        self.db.delete(cliente)
+        self.db.commit()
+        return True
