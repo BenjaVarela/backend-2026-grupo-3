@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.domain.pedido import Pedido
+from app.domain.models import Pedido
 
 class PedidosRepositorio:
     def __init__(self, db: Session):
@@ -12,11 +12,11 @@ class PedidosRepositorio:
         return self.db.query(Pedido).filter(Pedido.id == pedido_id).first()
 
     def guardar(self, datos: dict):
-        nuevo_pedido = Pedido(**datos)
-        self.db.add(nuevo_pedido)
+        nuevo = Pedido(**datos)
+        self.db.add(nuevo)
         self.db.commit()
-        self.db.refresh(nuevo_pedido)
-        return nuevo_pedido
+        self.db.refresh(nuevo)
+        return nuevo
 
     def actualizar(self, pedido_id: int, datos: dict):
         pedido = self.obtener_por_id(pedido_id)

@@ -1,22 +1,22 @@
 from sqlalchemy.orm import Session
-from app.domain.cliente import Cliente
+from app.domain.models import Cliente
 
 class ClientesRepositorio:
     def __init__(self, db: Session):
         self.db = db
 
-    def obtener_todas(self):
+    def obtener_todos(self):
         return self.db.query(Cliente).all()
 
     def obtener_por_id(self, cliente_id: int):
         return self.db.query(Cliente).filter(Cliente.id == cliente_id).first()
 
     def guardar(self, datos: dict):
-        nuevo_cliente = Cliente(**datos)
-        self.db.add(nuevo_cliente)
+        nuevo = Cliente(**datos)
+        self.db.add(nuevo)
         self.db.commit()
-        self.db.refresh(nuevo_cliente)
-        return nuevo_cliente
+        self.db.refresh(nuevo)
+        return nuevo
 
     def actualizar(self, cliente_id: int, datos: dict):
         cliente = self.obtener_por_id(cliente_id)

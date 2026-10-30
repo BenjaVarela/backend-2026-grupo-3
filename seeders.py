@@ -20,15 +20,15 @@ def run_seeders():
 
     if not db.query(Producto).first():
         db.add_all([
-            Producto(nombre="Cafe Americano", precio=1500.0, categoria_id=1),
-            Producto(nombre="Medialuna", precio=800.0, categoria_id=2)
+            Producto(nombre="Cafe Americano", precio=1500.0, stock=10, categoria_id=1),
+            Producto(nombre="Medialuna", precio=800.0, stock=15, categoria_id=2)
         ])
         db.commit()
 
     if not db.query(Pedido).first():
         db.add_all([
-            Pedido(cliente_id=1),
-            Pedido(cliente_id=2)
+            Pedido(cliente_id=1, producto_id=1, cantidad=2, monto_total=3000.0, estado="pendiente"),
+            Pedido(cliente_id=2, producto_id=2, cantidad=1, monto_total=800.0, estado="pendiente")
         ])
         db.commit()
 
