@@ -1,15 +1,22 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime
 
-class CategoriaProductoBase(BaseModel):
-    nombre: str = Field(..., min_length=1, description="Nombre de la categoría")
-    descripcion: str = Field(..., min_length=1, description="Descripción corta")
-    activa: bool = True
+class CategoriaBase(BaseModel):
+    nombre: str = Field(..., min_length=3, max_length=50)
+    descripcion: Optional[str] = Field(None, max_length=200)
+    estado_activo: Optional[bool] = True
 
-class CategoriaProductoCreate(CategoriaProductoBase):
+class CategoriaCreate(CategoriaBase):
     pass
 
-class CategoriaProductoResponse(CategoriaProductoBase):
+class CategoriaResponse(CategoriaBase):
     id: int
+    fecha_creacion: datetime
 
     class Config:
         from_attributes = True
+
+CategoriaProductoBase = CategoriaBase
+CategoriaProductoCreate = CategoriaCreate
+CategoriaProductoResponse = CategoriaResponse
