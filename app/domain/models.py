@@ -1,11 +1,15 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 from app.database import Base
 
 class Categoria(Base):
     __tablename__ = "categorias"
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(50), unique=True, nullable=False)
+    descripcion = Column(String(200), nullable=True)
+    estado_activo = Column(Boolean, default=True)
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
     productos = relationship("Producto", back_populates="categoria")
 
 class Cliente(Base):
@@ -13,6 +17,8 @@ class Cliente(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
+    telefono = Column(String(20), nullable=True)
+    direccion = Column(String(200), nullable=True)
     pedidos = relationship("Pedido", back_populates="cliente")
 
 class Producto(Base):

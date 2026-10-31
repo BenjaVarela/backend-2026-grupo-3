@@ -1,15 +1,28 @@
-from fastapi import FastAPI, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import HTTPException
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-def configurar_excepciones(app: FastAPI):
-    @app.exception_handler(HTTPException)
-    async def http_exception_handler(request: Request, exc: HTTPException):
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={
-                "estado": "error",
-                "codigo": exc.status_code,
-                "mensaje": exc.detail
-            },
-        )
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": {
+                "code": "HTTP_ERROR",
+                "message": str(exc.detail),
+                "details": []
+            }
+        }
+    )
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": {
+                "code": "UNPROCESSABLE_ENTITY",
+                "message": "Los datos no cumplen el esquema o las validaciones declaradas",
+                "details": exc.errors()
+            }
+        }
+    )

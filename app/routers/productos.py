@@ -21,32 +21,30 @@ def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
 
 @router.get("/")
 def listar_productos(
-    categoria_id: Optional[int] = Query(None),
-    ordenar_precio: Optional[str] = Query(None),
+    categoria: Optional[int] = Query(None, description="Filtrar por ID de categoría"),
+    ordenar_por: Optional[str] = Query(None, description="Atributo para ordenar (ej. precio)"),
+    direccion: str = Query("asc", pattern="^(asc|desc)$"),
     pagina: int = Query(1, ge=1),
-    limite: int = Query(10, ge=1),
+    limite: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     repo = ProductosRepositorio(db)
-    productos = repo.obtener_todas()
-
-    if categoria_id is not None:
-        productos = [p for p in productos if p.categoria_id == categoria_id]
-    if ordenar_precio == "asc":
-        productos.sort(key=lambda x: x.precio)
-    elif ordenar_precio == "desc":
-        productos.sort(key=lambda x: x.precio, reverse=True)
-
-    total = len(productos)
+    items, total = repo.obtener_con_filtros_y_paginacion(
+        categoria_id=categoria,
+        ordenar_por=ordenar_por,
+        direccion=direccion,
+        pagina=pagina,
+        limite=limite
+    )
+    
     total_paginas = math.ceil(total / limite) if total > 0 else 1
-    inicio = (pagina - 1) * limite
-    fin = inicio + limite
 
     return {
+        "items": items,
         "total": total,
-        "total_paginas": total_paginas,
-        "pagina_actual": pagina,
-        "data": productos[inicio:fin]
+        "pagina": pagina,
+        "limite": limite,
+        "total_paginas": total_paginas
     }
 
 @router.get("/{producto_id}", response_model=ProductoResponse)

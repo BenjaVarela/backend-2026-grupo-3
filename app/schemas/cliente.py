@@ -1,10 +1,11 @@
 from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
 
 class ClienteBase(BaseModel):
-    nombre: str = Field(..., min_length=1, description="Nombre del cliente")
-    correo: EmailStr = Field(..., description="Correo electrónico válido")
-    telefono: str = Field(..., min_length=8, description="Teléfono de contacto")
-    tipo_cliente: str = Field(..., min_length=1, description="Estudiante o Docente")
+    nombre: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    telefono: Optional[str] = Field(None, max_length=20)
+    direccion: Optional[str] = Field(None, max_length=200)
 
 class ClienteCreate(ClienteBase):
     pass

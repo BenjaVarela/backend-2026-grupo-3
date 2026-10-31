@@ -1,23 +1,25 @@
-from enum import Enum
 from pydantic import BaseModel, Field
+from typing import Optional
+from enum import Enum
 
 class EstadoPedido(str, Enum):
-    PENDIENTE = "pendiente"
-    EN_PREPARACION = "en_preparacion"
-    LISTO = "listo"
-    ENTREGADO = "entregado"
+    pendiente = "pendiente"
+    pagado = "pagado"
+    entregado = "entregado"
+    cancelado = "cancelado"
 
-class PedidoCreate(BaseModel):
-    cliente_id: int = Field(..., gt=0)   # Cambiado
-    producto_id: int = Field(..., gt=0)  # Cambiado
-    cantidad: int = Field(..., gt=0)
+class PedidoBase(BaseModel):
+    cliente_id: int = Field(..., gt=0, description="ID del cliente debe ser mayor a 0")
+    producto_id: int = Field(..., gt=0)
+    cantidad: int = Field(..., gt=0, le=100, description="La cantidad debe ser entre 1 y 100")
+    monto_total: float = Field(..., gt=0)
+    estado: EstadoPedido = Field(default=EstadoPedido.pendiente)
 
-class PedidoResponse(BaseModel):
+class PedidoCreate(PedidoBase):
+    pass
+
+class PedidoResponse(PedidoBase):
     id: int
-    cliente_id: int
-    producto_id: int
-    cantidad: int
-    monto_total: float = Field(..., ge=0)
-    estado: EstadoPedido
+
     class Config:
         from_attributes = True
