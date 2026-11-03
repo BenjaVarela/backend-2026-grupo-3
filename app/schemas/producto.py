@@ -4,7 +4,7 @@ class ProductoBase(BaseModel):
     nombre: str = Field(..., min_length=1)
     precio: float = Field(..., gt=0)
     stock: int = Field(..., ge=0)
-    categoria_id: int = Field(..., gt=0) # Cambiado de id_categoria
+    categoria_id: int = Field(..., gt=0)
 
 class ProductoCreate(ProductoBase):
     pass

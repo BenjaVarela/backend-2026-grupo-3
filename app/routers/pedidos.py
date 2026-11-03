@@ -36,8 +36,13 @@ def actualizar_estado_pedido(pedido_id: int, estado: EstadoPedido, db: Session =
     
     return repo.actualizar(pedido_id, {"estado": estado.value})
 
-@router.delete("/{pedido_id}", status_code=204)
+@router.delete("/{pedido_id}", status_code=200)
 def eliminar_pedido(pedido_id: int, db: Session = Depends(get_db)):
     repo = PedidosRepositorio(db)
     if not repo.eliminar(pedido_id):
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    
+    return {
+        "mensaje": f"Pedido con ID {pedido_id} eliminado exitosamente",
+        "estado": "success"
+    }
