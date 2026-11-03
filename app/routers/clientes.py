@@ -46,8 +46,13 @@ def actualizar_cliente(cliente_id: int, cliente: ClienteCreate, db: Session = De
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return actualizado
 
-@router.delete("/{cliente_id}", status_code=204)
+@router.delete("/{cliente_id}", status_code=200)
 def eliminar_cliente(cliente_id: int, db: Session = Depends(get_db)):
     repo = ClientesRepositorio(db)
     if not repo.eliminar(cliente_id):
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    
+    return {
+        "mensaje": f"Cliente con ID {cliente_id} eliminado exitosamente",
+        "estado": "success"
+    }

@@ -70,8 +70,13 @@ def actualizar_producto(producto_id: int, producto: ProductoUpdate, db: Session 
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return actualizado
 
-@router.delete("/{producto_id}", status_code=204)
+@router.delete("/{producto_id}", status_code=200)
 def eliminar_producto(producto_id: int, db: Session = Depends(get_db)):
     repo = ProductosRepositorio(db)
     if not repo.eliminar(producto_id):
         raise HTTPException(status_code=404, detail="Producto no encontrado")
+    
+    return {
+        "mensaje": f"Producto con ID {producto_id} eliminado exitosamente",
+        "estado": "success"
+    }

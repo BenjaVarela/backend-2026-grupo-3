@@ -32,8 +32,13 @@ def actualizar_categoria(categoria_id: int, categoria: CategoriaProductoCreate, 
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return actualizado
 
-@router.delete("/{categoria_id}", status_code=204)
+@router.delete("/{categoria_id}", status_code=200)
 def eliminar_categoria(categoria_id: int, db: Session = Depends(get_db)):
     repo = CategoriasRepositorio(db)
     if not repo.eliminar(categoria_id):
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    
+    return {
+        "mensaje": f"Categoría con ID {categoria_id} eliminada exitosamente",
+        "estado": "success"
+    }
