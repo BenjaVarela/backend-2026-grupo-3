@@ -12,7 +12,6 @@ class PedidoBase(BaseModel):
     cliente_id: int = Field(..., gt=0, description="ID del cliente debe ser mayor a 0")
     producto_id: int = Field(..., gt=0)
     cantidad: int = Field(..., gt=0, le=100, description="La cantidad debe ser entre 1 y 100")
-    monto_total: float = Field(..., gt=0)
     estado: EstadoPedido = Field(default=EstadoPedido.pendiente)
 
 class PedidoCreate(PedidoBase):
@@ -20,6 +19,6 @@ class PedidoCreate(PedidoBase):
 
 class PedidoResponse(PedidoBase):
     id: int
-
+    monto_total: float
     class Config:
         from_attributes = True

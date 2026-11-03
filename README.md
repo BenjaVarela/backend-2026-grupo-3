@@ -9,7 +9,7 @@ API REST desarrollada para la gestión comercial y transaccional de un sistema d
 | **Benjamín Varela** *(Líder)* | Coordinación y seguimiento + Documentación e integración | Organización del backlog, seguimiento de hitos, integración de entregables, Swagger/OpenAPI, README y configuración de migraciones Alembic. |
 | **Benjamín Riquelme.** | Dominio y datos | Modelado de las 4 entidades ORM, relaciones 1:N, esquemas Pydantic/DTOs, reglas de validación y seeders de carga inicial. |
 | **Diego Manquicoy** | API y lógica de negocio | Implementación de la arquitectura por capas, endpoints REST, servicios transaccionales, control ACID y manejo uniforme de errores HTTP. |
-| **Mauricio Valdés** | Calidad y pruebas | Verificación funcional de endpoints, colección de pruebas en Postman, validación de persistencia y consultas con filtro, orden y paginación. |
+| **Mauricio Valdés** | Calidad y pruebas | Verificación funcional de endpoints, colección de pruebas en Swagger, validación de persistencia y consultas con filtro, orden y paginación. |
 
 ## 1. Problemática y Alcance
 
@@ -54,7 +54,7 @@ El sistema administra de forma persistente cuatro entidades principales: **Clien
 * **Validación de Datos:** Pydantic (DTOs estrictos)
 * **ORM y Base de Datos:** SQLAlchemy y SQLite (preparado para PostgreSQL)
 * **Migraciones de Esquema:** Alembic
-* **Pruebas de Contrato:** Postman / OpenAPI (Swagger UI)
+* **Pruebas de Contrato:** OpenAPI (Swagger UI)
 
 ## 3. Arquitectura por Capas y Organización del Código
 
@@ -146,7 +146,6 @@ La API cuenta con un CRUD completo para las entidades principales y cumple con l
 
 ## 6. Pruebas Iniciales y Evidencias
 
-El repositorio incluye una colección exportada en la carpeta `postman/` (`Backend 2026 API P1.postman_collection.json`) que permite reproducir los casos de prueba obligatorios:
 1. **Creación exitosa** de recursos con códigos 201.
 2. **Validación fallida** (Retorno de error 422 por tipos o longitudes incorrectas).
 3. **Recurso no encontrado** (Retorno de error 404 estructurado).
