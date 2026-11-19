@@ -1,22 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.dependencies import RESPUESTA_401, RESPUESTAS_ADMIN, requiere_admin, usuario_actual
 from app.schemas.categoria import CategoriaProductoCreate, CategoriaProductoResponse
 from app.repositories.categorias_repository import CategoriasRepositorio
 
 router = APIRouter(prefix="/categorias", tags=["Categorías"])
 
-@router.post("/", response_model=CategoriaProductoResponse, status_code=201)
+@router.post("/", response_model=CategoriaProductoResponse, status_code=201, dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN)
 def crear_categoria(categoria: CategoriaProductoCreate, db: Session = Depends(get_db)):
     repo = CategoriasRepositorio(db)
     return repo.guardar(categoria.model_dump())
 
-@router.get("/", response_model=list[CategoriaProductoResponse])
+@router.get("/", response_model=list[CategoriaProductoResponse], dependencies=[Depends(usuario_actual)], responses=RESPUESTA_401)
 def listar_categorias(db: Session = Depends(get_db)):
     repo = CategoriasRepositorio(db)
     return repo.obtener_todas()
 
-@router.get("/{categoria_id}", response_model=CategoriaProductoResponse)
+@router.get("/{categoria_id}", response_model=CategoriaProductoResponse, dependencies=[Depends(usuario_actual)], responses=RESPUESTA_401)
 def obtener_categoria(categoria_id: int, db: Session = Depends(get_db)):
     repo = CategoriasRepositorio(db)
     categoria = repo.obtener_por_id(categoria_id)
@@ -24,7 +25,7 @@ def obtener_categoria(categoria_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return categoria
 
-@router.put("/{categoria_id}", response_model=CategoriaProductoResponse)
+@router.put("/{categoria_id}", response_model=CategoriaProductoResponse, dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN)
 def actualizar_categoria(categoria_id: int, categoria: CategoriaProductoCreate, db: Session = Depends(get_db)):
     repo = CategoriasRepositorio(db)
     actualizado = repo.actualizar(categoria_id, categoria.model_dump())
@@ -32,7 +33,7 @@ def actualizar_categoria(categoria_id: int, categoria: CategoriaProductoCreate, 
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return actualizado
 
-@router.delete("/{categoria_id}", status_code=200)
+@router.delete("/{categoria_id}", status_code=200, dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN)
 def eliminar_categoria(categoria_id: int, db: Session = Depends(get_db)):
     repo = CategoriasRepositorio(db)
     if not repo.eliminar(categoria_id):
