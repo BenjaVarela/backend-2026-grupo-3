@@ -1,29 +1,83 @@
+x-database-env: &database-env
+  POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+  POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Configura POSTGRES_PASSWORD en .env}"
+  POSTGRES_DB: "${POSTGRES_DB:-cafeteria_db}"
+
+x-api-build: &api-build
+  context: .
+  dockerfile: docker/Dockerfile
+
 services:
   db:
-    image: postgres:15-alpine
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cafeteria_db
-    ports:
-      - "5433:5432"
+    image: postgres:15.20-alpine3.23
+    environment: *database-env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
+
+  migrate:
+    build: *api-build
+    image: "${API_IMAGE:-cafeteria-api:local}"
+    environment: *database-env
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    depends_on:
+      db:
+        condition: service_healthy
 
   web:
-    build: .
-    container_name: fastapi_app
-    restart: always
+    image: "${API_IMAGE:-cafeteria-api:local}"
+    pull_policy: never
     ports:
-      - "8000:8000"
+      - "127.0.0.1:${API_PORT:-8000}:8000"
     environment:
-      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/cafeteria_db
+      <<: *database-env
+      JWT_SECRET: "${JWT_SECRET:?Configura JWT_SECRET en .env}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+      APP_ORIGINS: "${APP_ORIGINS:-http://127.0.0.1:${API_PORT:-8000},http://localhost:${API_PORT:-8000}}"
+      SMTP_HOST: "${SMTP_HOST:-mailpit}"
+      SMTP_PORT: "${SMTP_PORT:-1025}"
+      SMTP_TLS: "${SMTP_TLS:-none}"
+      SMTP_FROM: "${SMTP_FROM:-cafeteria@example.test}"
+      SMTP_USERNAME: "${SMTP_USERNAME:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
     depends_on:
-      - db
-    volumes:
-      - .:/app
+      migrate:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health', timeout=3).close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  adminer:
+    image: adminer:6.3.0-standalone
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "127.0.0.1:${ADMINER_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  mailpit:
+    image: axllent/mailpit:v1.31.4
+    ports:
+      - "127.0.0.1:${MAILPIT_PORT:-8025}:8025"
+    environment:
+      MP_MAX_MESSAGES: "100"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   postgres_data:

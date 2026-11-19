@@ -1,0 +1,11 @@
+**
+!requirements.txt
+!app/
+app/**
+!app/**/*.py
+!alembic/
+alembic/**
+!alembic/**/*.py
+!alembic/script.py.mako
+!alembic.ini
+!seeders.py

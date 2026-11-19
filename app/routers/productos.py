@@ -3,13 +3,14 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.dependencies import RESPUESTA_401, RESPUESTAS_ADMIN, requiere_admin, usuario_actual
 from app.schemas.producto import ProductoCreate, ProductoUpdate, ProductoResponse
 from app.repositories.productos_repository import ProductosRepositorio
 from app.repositories.categorias_repository import CategoriasRepositorio
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
-@router.post("/", response_model=ProductoResponse, status_code=201)
+@router.post("/", response_model=ProductoResponse, status_code=201, dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN)
 def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
     repo = ProductosRepositorio(db)
     categorias_repo = CategoriasRepositorio(db)
@@ -19,7 +20,7 @@ def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Categoría no existe.")
     return repo.guardar(producto.model_dump())
 
-@router.get("/")
+@router.get("/", dependencies=[Depends(usuario_actual)], responses=RESPUESTA_401)
 def listar_productos(
     categoria: Optional[int] = Query(None, description="Filtrar por ID de categoría"),
     ordenar_por: Optional[str] = Query(None, description="Atributo para ordenar (ej. precio)"),
@@ -47,7 +48,7 @@ def listar_productos(
         "total_paginas": total_paginas
     }
 
-@router.get("/{producto_id}", response_model=ProductoResponse)
+@router.get("/{producto_id}", response_model=ProductoResponse, dependencies=[Depends(usuario_actual)], responses=RESPUESTA_401)
 def obtener_producto(producto_id: int, db: Session = Depends(get_db)):
     repo = ProductosRepositorio(db)
     producto = repo.obtener_por_id(producto_id)
@@ -55,7 +56,7 @@ def obtener_producto(producto_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return producto
 
-@router.put("/{producto_id}", response_model=ProductoResponse)
+@router.put("/{producto_id}", response_model=ProductoResponse, dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN)
 def actualizar_producto(producto_id: int, producto: ProductoUpdate, db: Session = Depends(get_db)):
     repo = ProductosRepositorio(db)
     categorias_repo = CategoriasRepositorio(db)
@@ -70,7 +71,7 @@ def actualizar_producto(producto_id: int, producto: ProductoUpdate, db: Session 
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return actualizado
 
-@router.delete("/{producto_id}", status_code=200)
+@router.delete("/{producto_id}", status_code=200, dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN)
 def eliminar_producto(producto_id: int, db: Session = Depends(get_db)):
     repo = ProductosRepositorio(db)
     if not repo.eliminar(producto_id):

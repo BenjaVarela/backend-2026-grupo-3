@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.dependencies import RESPUESTAS_ADMIN, requiere_admin
 from app.schemas.cliente import ClienteCreate, ClienteResponse
 from app.schemas.pedido import PedidoResponse
 from app.repositories.clientes_repository import ClientesRepositorio
 from app.repositories.pedidos_repository import PedidosRepositorio
 
-router = APIRouter(prefix="/clientes", tags=["Clientes"])
+router = APIRouter(
+    prefix="/clientes", tags=["Clientes"], dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN
+)
 
 @router.post("/", response_model=ClienteResponse, status_code=201)
 def crear_cliente(cliente: ClienteCreate, db: Session = Depends(get_db)):

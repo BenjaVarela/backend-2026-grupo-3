@@ -39,7 +39,6 @@ El sistema administra de forma persistente cuatro entidades principales: **Clien
 
 ### P6. Exclusiones de Alcance
 * No incluye pasarela de pagos real ni procesamiento de tarjetas de crédito transaccionales externas.
-* No incluye autenticación avanzada por tokens JWT ni roles de seguridad avanzados (foco exclusivo en la lógica de negocio y persistencia).
 * No incluye interfaz gráfica de usuario (Frontend web o móvil), limitándose al contrato OpenAPI y pruebas de integración.
 
 ### P7. Criterios de Aceptación
@@ -49,100 +48,89 @@ El sistema administra de forma persistente cuatro entidades principales: **Clien
 
 ## 2. Tecnologías y Stack Tecnológico
 
-* **Lenguaje:** Python 3.10+
+* **Lenguaje:** Python 3.14.10 en la imagen de la API.
 * **Framework Web:** FastAPI (con Uvicorn como servidor ASGI)
 * **Validación de Datos:** Pydantic (DTOs estrictos)
-* **ORM y Base de Datos:** SQLAlchemy y SQLite (preparado para PostgreSQL)
+* **ORM y Base de Datos:** SQLAlchemy y PostgreSQL 15.20.
 * **Migraciones de Esquema:** Alembic
 * **Pruebas de Contrato:** OpenAPI (Swagger UI)
 
-## 3. Arquitectura por Capas y Organización del Código
+## 3. Arquitectura por capas
 
-El proyecto sigue una estricta **Arquitectura en Capas** para garantizar la separación de responsabilidades (SoC):
+| Responsabilidad | Archivos |
+| --- | --- |
+| Ensamblaje y configuración | `app/main.py` registra rutas, CORS, errores y salud. `app/config.py` lee el entorno. |
+| Presentación | `app/routers/`, `app/schemas/`, `app/dependencies.py` y `app/http_security.py` validan las entradas, resuelven permisos y manejan Bearer, cookies y CSRF. |
+| Aplicación | `app/services/` coordina casos de uso. `auth_service.py` administra cuentas, rotación y restablecimiento. `recuperacion.py` coordina el envío del correo tras guardar el permiso. |
+| Dominio | `app/domain/auth.py` define roles, políticas y errores. Los modelos ORM de negocio siguen en `app/domain/models.py`. Una cuenta `Usuario` y un perfil comercial `Cliente` son registros independientes. |
+| Infraestructura | `app/database.py`, `app/repositories/`, `app/infrastructure/` y `alembic/` se ocupan de persistencia, Argon2id, firma y verificación JWT, SMTP y migraciones. |
 
-```text
-app/
-├── main.py                     # Ensamblaje principal de la aplicación FastAPI y manejo de excepciones
-├── database.py                 # Configuración del engine, SessionLocal y dependencias de BD (yield/close)
-├── domain/
-│   └── models.py               # Entidades del dominio y modelos ORM de SQLAlchemy
-├── schemas/                    # DTOs de Pydantic para validación de entrada y serialización de salida
-│   ├── categoria.py
-│   ├── cliente.py
-│   ├── pedido.py
-│   └── producto.py
-├── repositories/               # Capa de persistencia y consultas aisladas al ORM
-│   ├── categorias_repository.py
-│   ├── clientes_repository.py
-│   ├── pedidos_repository.py
-│   └── productos_repository.py
-├── services/                   # Lógica de negocio transaccional y control ACID
-│   └── pedido_service.py
-└── routers/                    # Capa de presentación (Endpoints HTTP RESTful)
-    ├── categorias.py
-    ├── clientes.py
-    ├── pedidos.py
-    └── productos.py
+En `POST /auth/restablecer`, el router valida el DTO y delega al servicio. El servicio valida el JWT de recuperación, obtiene el usuario a partir de `sub` y bloquea su fila en PostgreSQL. Tras comprobar el `jti`, guarda el nuevo hash, consume el permiso, aumenta la versión de acceso y revoca los refresh en una misma transacción. La siguiente petición Bearer comprueba esa versión contra la guardada en la cuenta.
+
+```mermaid
+erDiagram
+    USUARIOS ||--o{ REFRESH_TOKENS : tiene
+    CATEGORIAS ||--o{ PRODUCTOS : agrupa
+    CLIENTES ||--o{ PEDIDOS : realiza
+    PRODUCTOS ||--o{ PEDIDOS : aparece_en
 ```
 
-### Recorrido de una Solicitud (Request Flow)
-1. **Cliente HTTP:** Envía la petición estructurada en formato JSON.
-2. **Capa de Presentación (`routers/`):** Intercepta la petición, valida la estructura mediante **DTOs de Pydantic** y delega la ejecución inyectando la sesión de base de datos (`Depends`).
-3. **Capa de Lógica de Negocio (`services/`):** Ejecuta las reglas de dominio y maneja la transacción atómica (`commit` / `rollback`).
-4. **Capa de Acceso a Datos (`repositories/`):** Traduce las operaciones a comandos del **ORM SQLAlchemy**.
-5. **Capa de Persistencia (`database.db`):** Almacena y consolida la información de manera permanente.
+## 4. Inicio con Docker Compose
 
-## 4. Guía de Instalación y Ejecución Local
+Se requiere Docker Desktop o Docker Engine con Compose V2. Desde la raíz del repositorio, copia `.env.example` a `.env` (`Copy-Item .env.example .env` en PowerShell o `cp .env.example .env` en Bash). Completa `POSTGRES_PASSWORD` y `JWT_SECRET` con valores distintos. Puedes generar cada valor por separado con `python -c "import secrets; print(secrets.token_urlsafe(48))"` o `openssl rand -hex 32`.
 
-Sigue estos pasos para clonar, configurar y poner en marcha el proyecto desde una copia limpia:
-
-### 1. Clonar el repositorio
 ```bash
-git clone <URL-DEL-REPOSITORIO>
-cd backend-2026-grupo-3
+docker compose up -d --build --wait
+docker compose ps -a
 ```
 
-### 2. Crear y activar un entorno virtual
-```bash
-python -m venv venv
-# En Windows (Git Bash / CMD):
-source venv/Scripts/activate
-# En Linux / macOS:
-source venv/bin/activate
-```
+| Servicio | Acceso local |
+| --- | --- |
+| API y Swagger | `http://127.0.0.1:8000/docs` |
+| Comprobación de disponibilidad | `http://127.0.0.1:8000/health` |
+| Adminer | `http://127.0.0.1:8080`. En el formulario selecciona PostgreSQL, servidor `db` y los valores de `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB`. |
+| Capturador Mailpit | `http://127.0.0.1:8025`. Recibe el correo SMTP desde la red de Compose. |
 
-### 3. Instalar dependencias
-```bash
-pip install -r requirements.txt
-```
+Los puertos publicados se pueden cambiar en `.env` mediante `API_PORT`, `ADMINER_PORT` y `MAILPIT_PORT`. PostgreSQL escucha en la red interna de Compose. El volumen `postgres_data` conserva los datos al recrear la API, ejecutar `stop` o ejecutar `down`. Si ya existe un volumen, utiliza su usuario, contraseña y base de datos. PostgreSQL aplica esas variables de inicialización solo al crear un volumen vacío.
 
-### 4. Configurar variables de entorno
-Crea un archivo `.env` basado en el archivo de ejemplo (si aplica) o verifica que la URL por defecto de la base de datos en `app/database.py` esté activa.
+| Operación | Comando |
+| --- | --- |
+| Construir la imagen | `docker compose build migrate` |
+| Iniciar o actualizar | `docker compose up -d --build --wait` |
+| Aplicar migraciones manualmente | `docker compose run --rm migrate` |
+| Consultar la revisión de la base | `docker compose exec web python -m alembic current` |
+| Cargar datos de demostración en una base de negocio vacía | `docker compose exec web python seeders.py` |
+| Crear una cuenta administrativa | `docker compose exec web python -m app.crear_admin admin@example.com` |
+| Consultar logs | `docker compose logs -f web migrate db mailpit` |
+| Detener o retirar los contenedores | `docker compose stop` o `docker compose down` |
 
-### 5. Aplicar migraciones con Alembic
-```bash
-alembic upgrade head
-```
+El servicio `migrate` ejecuta Alembic después del chequeo de PostgreSQL y la API arranca cuando la migración termina correctamente. El comando administrativo solicita la contraseña sin mostrarla y requiere un correo nuevo. Usa correos de demostración válidos. Mantén Adminer y Mailpit en la interfaz local.
 
-### 6. Ejecutar seeders (Carga inicial de datos)
-Para poblar la base de datos con los registros iniciales obligatorios:
-```bash
-python seeders.py
-```
+Al ejecutar la API fuera de Compose, configura `DATABASE_URL` o las variables `POSTGRES_*`. Con HTTPS deja `COOKIE_SECURE=true` y configura `APP_ORIGINS` con orígenes exactos, separados por comas. Para un servidor de correo real, configura `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` y, según el proveedor, `SMTP_USERNAME`, `SMTP_PASSWORD` y `SMTP_TLS=starttls` o `ssl`.
 
-### 7. Iniciar el servidor de desarrollo
-```bash
-uvicorn app.main:app --reload
-```
-La API estará disponible en `http://127.0.0.1:8000` y la documentación interactiva en `http://127.0.0.1:8000/docs`.
+## 5. Contrato OpenAPI y flujos de autenticación
 
-## 5. Contrato OpenAPI y Endpoints Principales
+| Operación | Autorización |
+| --- | --- |
+| Lectura de categorías y productos | Access Bearer de `usuario` o `admin` |
+| Crear, actualizar o eliminar categorías y productos | Access Bearer de `admin` |
+| Consultar o gestionar clientes y pedidos | Access Bearer de `admin` |
 
-La API cuenta con un CRUD completo para las entidades principales y cumple con los 12 endpoints funcionales mínimos exigidos:
-* `/clientes` (GET, POST, GET /{id}, PUT /{id}, DELETE /{id})
-* `/categorias` (GET, POST, GET /{id}, PUT /{id}, DELETE /{id})
-* `/productos` (GET, POST, GET /{id}, PUT /{id}, DELETE /{id}) [Soporta filtrado, ordenamiento y paginación en un mismo GET].
-* `/pedidos` (GET, POST, GET /{id}, DELETE /{id})
+Swagger muestra el Bearer y los errores 401 y 403 de las operaciones protegidas. Las consultas de productos conservan filtros, orden y paginación.
+
+| Ruta | Entrada y resultado |
+| --- | --- |
+| `POST /auth/registro` | JSON con `email` y `password`. Crea una cuenta `usuario` y responde 201. Un correo duplicado devuelve 409. |
+| `POST /auth/login` | JSON con `email` y `password`. Devuelve el access y establece la cookie refresh. Tras cinco intentos fallidos consecutivos se bloquea temporalmente el login durante 15 minutos. |
+| `GET /auth/me` | Devuelve el usuario y su rol para un Bearer válido. |
+| `POST /auth/refresh` | Envía la cookie y `X-CSRF-Protection: 1`. Entrega otro access y rota la cookie. |
+| `POST /auth/logout` | Envía la cookie y `X-CSRF-Protection: 1`. Revoca la familia de refresh, borra la cookie y responde 204. |
+| `POST /auth/recuperacion` | JSON con `email`. Responde 202 con el mismo mensaje para cualquier correo válido. Se permite un envío por minuto por cuenta. |
+| `POST /auth/restablecer` | JSON con `token` y `nueva_password`. Cambia la contraseña y responde 204. |
+
+El access JWT dura 15 minutos. El refresh es opaco y se guarda como hash. La familia dura como máximo siete días desde el login y se revoca si se reutiliza un refresh rotado. Tras el logout, un access emitido conserva su ventana de validez. La cookie es HttpOnly, queda limitada a `/auth` y usa `SameSite=Lax` para el flujo de navegador del mismo sitio. Refresh y logout requieren una cabecera personalizada y verifican el origen cuando el navegador lo envía. En HTTPS se añade `Secure`.
+
+Para demostrar la recuperación, registra una cuenta de prueba, inicia sesión y solicita la recuperación. Abre Mailpit y copia el JWT del correo a `POST /auth/restablecer`. El JWT de recuperación expira en diez minutos y cada cuenta tiene un único permiso vigente. Al cambiar la contraseña se invalidan ese permiso, las solicitudes anteriores y todos los access y refresh previos. Registro y restablecimiento usan la misma política de 12 a 128 caracteres y almacenan un hash Argon2id.
 
 ## 6. Pruebas Iniciales y Evidencias
 

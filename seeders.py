@@ -1,38 +1,28 @@
+from sqlalchemy import select
+
 from app.database import SessionLocal
-from app.domain.models import Categoria, Cliente, Producto, Pedido
+from app.domain.models import Categoria, Cliente, Pedido, Producto
+
 
 def run_seeders():
-    db = SessionLocal()
-    
-    if not db.query(Categoria).first():
-        db.add_all([
-            Categoria(nombre="Bebidas Calientes"),
-            Categoria(nombre="Pasteleria")
-        ])
-        db.commit()
+    with SessionLocal.begin() as db:
+        if any(db.scalar(select(modelo.id).limit(1)) is not None for modelo in (Categoria, Cliente, Producto, Pedido)):
+            print("Ya existen datos de negocio. Se omitió la carga de demostración.")
+            return
 
-    if not db.query(Cliente).first():
+        cafe = Producto(nombre="Cafe Americano", precio=1500.0, stock=10, categoria=Categoria(nombre="Bebidas Calientes"))
+        medialuna = Producto(nombre="Medialuna", precio=800.0, stock=15, categoria=Categoria(nombre="Pasteleria"))
+        carlos = Cliente(nombre="Carlos", email="carlos@example.com")
+        maria = Cliente(nombre="Maria", email="maria@example.com")
+        db.add_all([cafe, medialuna, carlos, maria])
+        db.flush()
         db.add_all([
-            Cliente(nombre="Carlos", email="carlos@correo.com"),
-            Cliente(nombre="Maria", email="maria@correo.com")
+            Pedido(cliente=carlos, producto_id=cafe.id, cantidad=2, monto_total=3000.0, estado="pendiente"),
+            Pedido(cliente=maria, producto_id=medialuna.id, cantidad=1, monto_total=800.0, estado="pendiente"),
         ])
-        db.commit()
 
-    if not db.query(Producto).first():
-        db.add_all([
-            Producto(nombre="Cafe Americano", precio=1500.0, stock=10, categoria_id=1),
-            Producto(nombre="Medialuna", precio=800.0, stock=15, categoria_id=2)
-        ])
-        db.commit()
+    print("Datos de demostración cargados.")
 
-    if not db.query(Pedido).first():
-        db.add_all([
-            Pedido(cliente_id=1, producto_id=1, cantidad=2, monto_total=3000.0, estado="pendiente"),
-            Pedido(cliente_id=2, producto_id=2, cantidad=1, monto_total=800.0, estado="pendiente")
-        ])
-        db.commit()
-
-    db.close()
 
 if __name__ == "__main__":
     run_seeders()
