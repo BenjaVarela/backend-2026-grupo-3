@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.domain.models import Producto
 
+
 class ProductosRepositorio:
     def __init__(self, db: Session):
         self.db = db
@@ -19,14 +20,20 @@ class ProductosRepositorio:
         self.db.refresh(db_item)
         return db_item
 
-    def actualizar(self, producto_id: int, datos: dict):
+    def actualizar(self, producto_id: int, datos: dict, *, commit: bool = True):
         db_item = self.obtener_por_id(producto_id)
         if not db_item:
             return None
+
         for key, value in datos.items():
             setattr(db_item, key, value)
-        self.db.commit()
-        self.db.refresh(db_item)
+
+        if commit:
+            self.db.commit()
+            self.db.refresh(db_item)
+        else:
+            self.db.flush()
+
         return db_item
 
     def eliminar(self, producto_id: int):
@@ -39,7 +46,7 @@ class ProductosRepositorio:
 
     def obtener_con_filtros_y_paginacion(self, categoria_id=None, ordenar_por=None, direccion="asc", pagina=1, limite=20):
         query = self.db.query(self.model)
-        
+
         if categoria_id is not None:
             query = query.filter(self.model.categoria_id == categoria_id)
 
@@ -49,9 +56,9 @@ class ProductosRepositorio:
                 query = query.order_by(columna.desc())
             else:
                 query = query.order_by(columna.asc())
-                
+
         total = query.count()
-        
+
         items = query.offset((pagina - 1) * limite).limit(limite).all()
-        
+
         return items, total
