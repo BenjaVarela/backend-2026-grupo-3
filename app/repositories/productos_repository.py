@@ -7,8 +7,12 @@ class ProductosRepositorio:
         self.db = db
         self.model = Producto
 
-    def obtener_por_id(self, producto_id: int):
-        return self.db.query(self.model).filter(self.model.id == producto_id).first()
+    def obtener_por_id(self, producto_id: int, *, bloquear: bool = False) -> Producto | None:
+        """Con bloquear=True, lee el estado actual y bloquea la fila hasta terminar la transacción."""
+        consulta = self.db.query(self.model).filter(self.model.id == producto_id)
+        if bloquear:
+            consulta = consulta.populate_existing().with_for_update()
+        return consulta.first()
 
     def obtener_todas(self):
         return self.db.query(self.model).all()

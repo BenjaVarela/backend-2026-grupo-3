@@ -5,7 +5,7 @@ x-database-env: &database-env
 
 x-api-build: &api-build
   context: .
-  dockerfile: docker/Dockerfile
+  dockerfile: Dockerfile
 
 services:
   db:

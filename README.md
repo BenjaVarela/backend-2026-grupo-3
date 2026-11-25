@@ -67,13 +67,7 @@ El sistema administra de forma persistente cuatro entidades principales: **Clien
 
 En `POST /auth/restablecer`, el router valida el DTO y delega al servicio. El servicio valida el JWT de recuperación, obtiene el usuario a partir de `sub` y bloquea su fila en PostgreSQL. Tras comprobar el `jti`, guarda el nuevo hash, consume el permiso, aumenta la versión de acceso y revoca los refresh en una misma transacción. La siguiente petición Bearer comprueba esa versión contra la guardada en la cuenta.
 
-```mermaid
-erDiagram
-    USUARIOS ||--o{ REFRESH_TOKENS : tiene
-    CATEGORIAS ||--o{ PRODUCTOS : agrupa
-    CLIENTES ||--o{ PEDIDOS : realiza
-    PRODUCTOS ||--o{ PEDIDOS : aparece_en
-```
+Los diagramas describen las relaciones de negocio y las cuentas de acceso. [Diagrama de clases](docs/diagrama-clases.md) · [Diagrama de datos](docs/diagrama-datos.md) · [Reglas y validaciones](docs/dominio-reglas.md)
 
 ## 4. Inicio con Docker Compose
 
