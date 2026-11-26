@@ -4,12 +4,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import allowed_origins, jwt_secret
 from app.dependencies import DB
-from app.excepciones import http_exception_handler, validation_exception_handler
+from app.excepciones import http_exception_handler, validation_exception_handler, integridad_exception_handler
 from app.routers import auth, categorias, clientes, pedidos, productos
 
 
@@ -29,6 +29,7 @@ app.add_middleware(
 )
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(IntegrityError, integridad_exception_handler)
 app.include_router(auth.router)
 app.include_router(categorias.router)
 app.include_router(clientes.router)
