@@ -19,3 +19,11 @@ class ProductoResponse(ProductoBase):
     id: int
     class Config:
         from_attributes = True
+
+class ProductoPagina(BaseModel):
+    items: list[ProductoResponse]
+    total: int
+    pagina: int
+    limite: int
+    total_paginas: int
+    

@@ -1,10 +1,10 @@
 import math
-from typing import Optional
+from typing import Literal, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import RESPUESTA_401, RESPUESTAS_ADMIN, requiere_admin, usuario_actual
-from app.schemas.producto import ProductoCreate, ProductoUpdate, ProductoResponse
+from app.schemas.producto import ProductoCreate, ProductoUpdate, ProductoResponse, ProductoPagina
 from app.repositories.productos_repository import ProductosRepositorio
 from app.repositories.categorias_repository import CategoriasRepositorio
 
@@ -20,10 +20,10 @@ def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Categoría no existe.")
     return repo.guardar(producto.model_dump())
 
-@router.get("/", dependencies=[Depends(usuario_actual)], responses=RESPUESTA_401)
+@router.get("/", response_model=ProductoPagina, summary="Listar productos", dependencias=[Depends(usuario_actual)], responses=RESPUESTA_401)
 def listar_productos(
     categoria: Optional[int] = Query(None, description="Filtrar por ID de categoría"),
-    ordenar_por: Optional[str] = Query(None, description="Atributo para ordenar (ej. precio)"),
+    ordenar_por: Optional[Literal["id", "nombre", "precio", "stock"]] = Query(None, description="Campo para ordenar"),
     direccion: str = Query("asc", pattern="^(asc|desc)$"),
     pagina: int = Query(1, ge=1),
     limite: int = Query(20, ge=1, le=100),
