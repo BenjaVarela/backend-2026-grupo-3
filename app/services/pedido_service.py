@@ -14,7 +14,7 @@ def crear_pedido_servicio(pedido_data: PedidoCreate, db: Session):
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
-    producto = productos_repo.obtener_por_id(pedido_data.producto_id)
+    producto = productos_repo.obtener_bloqueado(pedido_data.producto_id)
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
 
@@ -24,7 +24,7 @@ def crear_pedido_servicio(pedido_data: PedidoCreate, db: Session):
     monto_total = producto.precio * pedido_data.cantidad
 
     try:
-        productos_repo.actualizar(producto.id, {"stock": producto.stock - pedido_data.cantidad})
+        productos_repo.actualizar(producto.id, {"stock": producto.stock - pedido_data.cantidad}, commit=False)
 
         nuevo_pedido = {
             "cliente_id": pedido_data.cliente_id,
@@ -34,8 +34,9 @@ def crear_pedido_servicio(pedido_data: PedidoCreate, db: Session):
             "estado": "pendiente"
         }
 
-        resultado = pedidos_repo.guardar(nuevo_pedido)
+        resultado = pedidos_repo.guardar(nuevo_pedido, commit=False)
         db.commit()
+        db.refresh(resultado)
         return resultado
 
     except Exception as e:
