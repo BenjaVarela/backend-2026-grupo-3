@@ -10,7 +10,11 @@ router = APIRouter(
     prefix="/pedidos", tags=["Pedidos"], dependencies=[Depends(requiere_admin)], responses=RESPUESTAS_ADMIN
 )
 
-@router.post("/", response_model=PedidoResponse, status_code=201)
+@router.post("/", response_model=PedidoResponse, status_code=201, summary="Crear pedido", responses={
+    404: {"description": "Cliente o producto no encontrado"},
+    409: {"description": "Stock insuficiente"},
+    },     
+)
 def crear_pedido(pedido: PedidoCreate, db: Session = Depends(get_db)):
     return crear_pedido_servicio(pedido, db)
 
