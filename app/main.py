@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="API Cafetería Universitaria", lifespan=lifespan)
+app = FastAPI(title="API Cafetería Universitaria v3", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins(),
