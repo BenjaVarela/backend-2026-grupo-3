@@ -16,5 +16,5 @@ jobs:
       - name: Redeploy en Kubero
         run: |
           curl -s -o /dev/null -w "%{http_code}\n" -X GET \
-            "https://kubero.inf.uct.cl/api/apps/NOMBRE-PIPELINE/production/grupo-3/restart" \
+            "https://kubero.inf.uct.cl/api/apps/grupo-3/production/backend-2026-grupo-3/restart" \
             -H "Authorization: Bearer ${{ secrets.KUBERO_TOKEN }}"
