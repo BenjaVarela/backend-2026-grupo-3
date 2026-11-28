@@ -42,7 +42,7 @@ async def integridad_exception_handler(request: Request, exc: IntegrityError):
         content={
             "error": {
                 "code": "CONFLICT",
-                "messaje": "El registro ya existe o rompe una relacion",
+                "message": "El registro ya existe o rompe una relacion",
                 "details": [],
             } 
         },

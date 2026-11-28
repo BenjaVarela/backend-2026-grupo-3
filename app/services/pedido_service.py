@@ -4,6 +4,7 @@ from app.schemas.pedido import PedidoCreate
 from app.repositories.productos_repository import ProductosRepositorio
 from app.repositories.pedidos_repository import PedidosRepositorio
 from app.repositories.clientes_repository import ClientesRepositorio
+from sqlalchemy.exc import IntegrityError
 
 def crear_pedido_servicio(pedido_data: PedidoCreate, db: Session):
     productos_repo = ProductosRepositorio(db)
@@ -35,10 +36,21 @@ def crear_pedido_servicio(pedido_data: PedidoCreate, db: Session):
         }
 
         resultado = pedidos_repo.guardar(nuevo_pedido, commit=False)
+        respuesta = {
+            "id": resultado.id,
+            "cliente_id": resultado.cliente_id,
+            "producto_id": resultado.producto_id,
+            "cantidad": resultado.cantidad,
+            "monto_total": resultado.monto_total,
+            "estado": resultado.estado,
+        }
         db.commit()
-        db.refresh(resultado)
-        return resultado
 
-    except Exception as e:
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="El pedido entra en conflicto con datos existentes")
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Error interno al procesar el pedido. No se alteró el stock.")
+
+    return respuesta       
