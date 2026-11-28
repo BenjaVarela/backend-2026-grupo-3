@@ -20,7 +20,7 @@ def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Categoría no existe.")
     return repo.guardar(producto.model_dump())
 
-@router.get("/", response_model=ProductoPagina, summary="Listar productos", dependencias=[Depends(usuario_actual)], responses=RESPUESTA_401)
+@router.get("/", response_model=ProductoPagina, summary="Listar productos", dependencies=[Depends(usuario_actual)], responses=RESPUESTA_401)
 def listar_productos(
     categoria: Optional[int] = Query(None, description="Filtrar por ID de categoría"),
     ordenar_por: Optional[Literal["id", "nombre", "precio", "stock"]] = Query(None, description="Campo para ordenar"),
