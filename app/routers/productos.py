@@ -28,7 +28,6 @@ def crear_producto(producto: ProductoCreate, db: Session = Depends(get_db)):
     dependencies=[Depends(usuario_actual)],
     responses=RESPUESTA_401,
 )
-
 def listar_productos(
     categoria: Optional[int] = Query(None, description="Filtrar por ID de categoría"),
     ordenar_por: Optional[Literal["id", "nombre", "precio", "stock"]] = Query(None, description="Campo para ordenar"),
