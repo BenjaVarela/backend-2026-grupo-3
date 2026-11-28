@@ -7,6 +7,12 @@ class ClientesRepositorio:
 
     def obtener_todos(self):
         return self.db.query(Cliente).all()
+    
+    def obtener_con_paginacion(self, pagina=1, limite=20):
+        query = self.db.query(Cliente).order_by(Cliente.id)
+        total = query.count()
+        items = query.offset((pagina - 1) * limite).limit(limite).all()
+        return items, total
 
     def obtener_por_id(self, cliente_id: int):
         return self.db.query(Cliente).filter(Cliente.id == cliente_id).first()

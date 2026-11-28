@@ -66,3 +66,11 @@ class ProductosRepositorio:
         items = query.offset((pagina - 1) * limite).limit(limite).all()
 
         return items, total
+
+    def obtener_bloqueado(self, producto_id: int):
+        return (
+            self.db.query(self.model)
+            .filter(self.model.id == producto_id)
+            .with_for_update()
+            .first()
+        )

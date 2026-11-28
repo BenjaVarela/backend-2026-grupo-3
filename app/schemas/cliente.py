@@ -15,3 +15,10 @@ class ClienteResponse(ClienteBase):
 
     class Config:
         from_attributes = True
+
+class ClientePagina(BaseModel):
+    items: list[ClienteResponse]
+    total: int
+    pagina: int
+    limite: int
+    total_paginas: int  

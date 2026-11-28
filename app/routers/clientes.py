@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+import math
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import RESPUESTAS_ADMIN, requiere_admin
-from app.schemas.cliente import ClienteCreate, ClienteResponse
+from app.schemas.cliente import ClienteCreate, ClienteResponse, ClientePagina
 from app.schemas.pedido import PedidoResponse
 from app.repositories.clientes_repository import ClientesRepositorio
 from app.repositories.pedidos_repository import PedidosRepositorio
@@ -16,10 +17,28 @@ def crear_cliente(cliente: ClienteCreate, db: Session = Depends(get_db)):
     repo = ClientesRepositorio(db)
     return repo.guardar(cliente.model_dump())
 
-@router.get("/", response_model=list[ClienteResponse])
-def listar_clientes(db: Session = Depends(get_db)):
+@router.get(
+    "/",
+    response_model=ClientePagina,
+    summary="Listar clientes",
+    description="Ejemplo con paginación: /clientes/?pagina=1&limite=10",
+)
+def listar_clientes(
+    pagina: int = Query(1, ge=1),
+    limite: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
     repo = ClientesRepositorio(db)
-    return repo.obtener_todos()
+    items, total = repo.obtener_con_paginacion(pagina=pagina, limite=limite)
+    total_paginas = math.ceil(total / limite) if total > 0 else 1
+
+    return {
+        "items": items,
+        "total": total,
+        "pagina": pagina,
+        "limite": limite,
+        "total_paginas": total_paginas,
+    }
 
 @router.get("/{cliente_id}", response_model=ClienteResponse)
 def obtener_cliente(cliente_id: int, db: Session = Depends(get_db)):

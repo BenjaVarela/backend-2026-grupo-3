@@ -15,7 +15,11 @@ class PedidoBase(BaseModel):
     estado: EstadoPedido = Field(default=EstadoPedido.pendiente)
 
 class PedidoCreate(PedidoBase):
-    pass
+    model_config = {
+        "json_schema_extra": {
+            "example": {"cliente_id": 1, "producto_id": 1, "cantidad": 2}
+        }
+    }
 
 class PedidoResponse(PedidoBase):
     id: int
